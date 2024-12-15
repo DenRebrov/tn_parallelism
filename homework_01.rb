@@ -5,17 +5,27 @@ files = 5.times.map do |i|
   filename
 end
 
+@lines = []
+threads = []
+
 # puts Sequentially
-def process_files_sequentially(files)
-  files.each do |file|
-    File.open(file, 'r') do |f|
-      f.each_line { |line| puts line }
-    end
+def process_file_sequentially(file)
+  File.open(file, 'r') do |f|
+    f.each_line { |line| @lines << line }
   end
 end
 
 start_time = Time.now
-process_files_sequentially(files)
+
+files.each do |file|
+  threads << Thread.new do
+    process_file_sequentially(file)
+  end
+end
+
+threads.each(&:join)
+
 end_time = Time.now
 
-puts "Время выполнения Sequentially: #{end_time - start_time} секунд" # Время выполнения Sequentially: 2.596501 секунд
+puts @lines
+puts "Время выполнения Sequentially: #{end_time - start_time} секунд" # Время выполнения Sequentially: 0.306686048 секунд
